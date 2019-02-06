@@ -104,12 +104,6 @@
                         </div>
                     </div>
 
-                    <t t-set="sum_text" t-value="o.format_sum_to_text(o.amount_total)"/>
-                    <t t-set="lines_count" t-value="len(o.invoice_line_ids)"/>
-
-                    <p>Всього найменувань <t t-esc="lines_count"/>, на суму <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></p>
-                    <p class="capitalize"><b><span t-esc="sum_text"/></b></p>
-
                     <hr/>
 					<table class="col-xs-12 pull-right">
 						<td>
