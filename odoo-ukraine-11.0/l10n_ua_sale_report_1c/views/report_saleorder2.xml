@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_sale_order_ua_1c_template2">
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})" />
+                <style>
+                    .fat { border-width:2px; border-color:#0b0b0b; }
+                    #products th:first-child, #products td:first-child {width:5%; min-width:30px; text-align:center }
+                    #products th:nth-child(2),#products td:nth-child(2) {width:10%}
+                    #products th:nth-child(3), #products td:nth-child(3) {width:32%}
+                    #products th:nth-child(4), #products td:nth-child(4) {width:8%}
+                    #products th:nth-child(5),#products td:nth-child(5) {width:9%}
+                    #products th:nth-child(6), #products td:nth-child(6) {width:10%}
+                    #products th:nth-child(7), #products td:nth-child(7) {width:10%}
+                    #products th:nth-child(8), #products td:nth-child(8) {width:13%}
+                </style>
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <h2>
+                        <span t-if="doc.state not in ['draft','sent']">Видаткова накладна №</span>
+                        <span t-if="doc.state in ['draft','sent']">Пропозиція покупцю №</span>
+                        <!--TODO!important: date_order to ukrainian date format -->
+                        <span t-field="doc.name"/><span> від </span><span t-field="doc.date_order" t-field-options='{"format":"d/MM/Y"}'/>
+                    </h2>
+
+                    <hr class="fat"></hr>
+
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <u>Постачальник:</u>
+                        </div>
+                        <div class="col-xs-8">
+                            <div t-if="doc.company_id.company_registry">
+                                <strong>Юр.адрес:</strong>
+                                ЄДРПОУ <span t-field="doc.company_id.company_registry"/>
+                            </div>
+                            <address t-field="doc.company_id.partner_id"
+                                t-field-options='{"widget": "contact", "fields": ["name", "address", "phone"], "no_marker": true, "phone_icons": true}' />
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <u>Покупець:</u>
+                        </div>
+                        <div class="col-xs-8">
+                            <span t-if="'company_registry' in doc.partner_id.fields_get() and doc.partner_id.company_registry">
+                                <div t-if="doc.partner_id.company_registry">
+                                    <strong>Юр.адрес:</strong>
+                                    ЄДРПОУ<span t-field="doc.partner_id.company_registry"></span>
+                                </div>
+                                <div t-field="doc.partner_id"
+                                    t-field-options='{"widget": "contact", "fields": ["name", "address", "phone"], "no_marker": true, "phone_icons": true}' />
+                            </span>
+                            <span t-if="not ('company_registry' in doc.partner_id.fields_get() and doc.partner_id.company_registry)">
+                                <span t-field="doc.partner_id.name"></span>
+                                <div t-field="doc.partner_id"
+                                    t-field-options='{"widget": "contact", "fields": ["name", "address", "phone"], "no_marker": true, "phone_icons": true}' />
+                            </span>
+                            <div t-if="doc.partner_shipping_id != doc.partner_invoice_id" class="mt8">
+                                <strong>Адреса доставки:</strong>
+                                <address t-field="doc.partner_shipping_id"
+                                    t-field-options='{"widget": "contact", "fields": ["name", "address", "phone"], "no_marker": true, "phone_icons": true}' />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt32 mb32" id="informations">
+                        <div t-if="doc.state not in ['draft','sent'] and doc.validity_date" class="col-xs-3">
+                            <strong>Дійсний до:</strong>
+                            <p t-field="doc.validity_date"/>
+                        </div>
+                        <div t-if="doc.state in ['draft','sent'] and doc.client_order_ref" class="col-xs-3">
+                            <strong>Номер документу у клієнта:</strong>
+                            <p t-field="doc.client_order_ref"/>
+                        </div>
+                        <div class="col-xs-3" t-if="doc.incoterm" groups="sale.group_display_incoterm">
+                            <strong>Інкотермс:</strong>
+                            <p t-field="doc.incoterm.code"/>
+                        </div>
+                    </div>
+
+                    <!-- Is there a discount on at least one line? -->
+                    <t t-set="display_discount" t-value="any([l.discount for l in doc.order_line])"/>
+                    <t t-set="display_sku" t-value="True"/>
+
+                    <table class="table table-bordered" id="products">
+                        <thead>
+                            <tr class="active">
+                                <th>№</th>
+                                <th t-if="display_sku">Артикул</th>
+                                <th>Товар</th>
+                                <th class="text-right">Кількість</th>
+                                <th class="text-left">Од.вимір.</th>
+                                <th class="text-right">Ціна</th>
+                                <th t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Знижка(%)</th>
+                                <th class="text-right">Сума</th>
+                            </tr>
+                       </thead>
+                       <tbody class="sale_tbody">
+                           <t t-set="i" t-value="1"></t>
+                            <t t-foreach="doc.order_line" t-as="l">
+                                <tr t-if="l.product_uom_qty">
+                                    <td>
+                                        <span t-esc="i"></span>
+                                        <t t-set="i" t-value="i+1"></t>
+                                    </td>
+                                    <td t-if="display_sku">
+                                        <span t-field="l.product_id.default_code"/>
+                                    </td>
+                                    <td>
+                                       <span t-field="l.name"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="l.product_uom_qty"/>
+                                    </td>
+                                    <td><span groups="product.group_uom" t-field="l.product_uom"/></td>
+                                    <td class="text-right">
+                                        <span t-field="l.price_unit"/>
+                                    </td>
+                                    <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                                        <span t-field="l.discount"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="l.price_subtotal"
+                                            t-field-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                        <br/>
+                                        <span style="font-size: 6.5pt;" t-esc="', '.join(map(lambda x: (x.description or x.name), l.tax_id))"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <div class="row" name="total">
+                        <!-- Table with totals -->
+                        <div class="col-xs-5 pull-right">
+                            <table class="table">
+                                <tr class="border-black">
+                                    <td><strong>Всього без ПДВ</strong></td>
+                                    <td width="100" class="text-right">
+                                        <span t-field="doc.amount_untaxed"
+                                            t-field-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ПДВ</td>
+                                    <td class="text-right">
+                                        <span t-field="doc.amount_tax"
+                                            t-field-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black">
+                                    <td><strong>Всього:</strong></td>
+                                    <td class="text-right">
+                                        <span t-field="doc.amount_total"
+                                            t-field-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Totals in hand-typing mode -->
+                        <div class="col-xs-7 pull-left">
+                            <t t-set="sum_text" t-value="doc.format_sum_to_text(doc.amount_total)"/>
+                            <t t-set="lines_count" t-value="len(doc.order_line)"/>
+                            <t t-set="vat_text" t-value="doc.format_sum_to_text(doc.amount_tax)"/>
+
+                            <p>Всього найменувань<t t-esc="lines_count"/>, на суму
+                                <span t-field="doc.amount_total"
+                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                            </p>
+                            <p class="capitalize">
+                                <b>
+                                    <span t-esc="sum_text"/>
+                                </b>
+                            </p>
+                            <p>
+                                <b>У т.ч. ПДВ:
+                                    <span t-esc="vat_text"/>
+                                </b>
+                            </p>
+                            <p t-field="doc.note"/>
+                            <p t-if="doc.payment_term_id.note">
+                                <span t-field="doc.payment_term_id.note"/>
+                            </p>
+                            <p t-if="not doc.payment_term_id and doc.partner_id.property_payment_term_id">
+                                <span t-field="doc.partner_id.property_payment_term_id.note"/>
+                            </p>
+                            <div class="row">
+                                <div class="col-xs-4">Місце складання</div>
+                                <div class="col-xs-6">
+                                    <span t-field="doc.location_signed_in"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="oe_structure"/>
+                    <hr class="fat"></hr>
+                    <div class="row mt32">
+                        <div class="col-xs-4">
+                            <span>Від постачальника*:</span><br/>
+                            <span>______________________________</span><br/>
+                            <span t-if="doc.state not in ['draft','sent'] and doc.user_id.name">
+                                <strong><p t-field="doc.user_id"/></strong>
+                                <p><small>* Відповідальний за здійснення господарської операції і правильність її оформлення</small></p>
+                            </span>
+                        </div>
+
+                        <div t-if="doc.state not in ['draft','sent']" class="col-xs-6 col-xs-offset-2">
+                            <span>Отримав(ла):</span><br/>
+                            <span>______________________________</span><br/>
+                            <span t-if="doc.state not in ['draft','sent'] and doc.user_id.name">
+                                <strong><p t-field="doc.partner_id.name"/></strong><br/>
+                                <p><small>За довіреністю  № _______ від ________</small></p>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="report_sale_order_ua_1c2" inherit_id="sale.report_saleorder">
+            <xpath expr="//t[@t-call='web.html_container']" position="replace">
+                <t t-call="web.html_container">
+                    <t t-foreach="docs" t-as="doc">
+                        <t t-call="l10n_ua_sale_report_1c.report_sale_order_ua_1c_template" t-lang="doc.partner_id.lang"/>
+                    </t>
+                </t>
+            </xpath>
+        </template>
+
+         <template id="report_sale_order_act_ua_1c2">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})"/>
+                        <style>
+                            .fat { border-width:2px; border-color:#0b0b0b; }
+                            #products th:first-child, #products td:first-child {width:5%; min-width:30px;
+                            text-align:center }
+                            #products th:nth-child(2),#products td:nth-child(2) {width:10%}
+                            #products th:nth-child(3), #products td:nth-child(3) {width:32%}
+                            #products th:nth-child(4), #products td:nth-child(4) {width:8%}
+                            #products th:nth-child(5),#products td:nth-child(5) {width:9%}
+                            #products th:nth-child(6), #products td:nth-child(6) {width:10%}
+                            #products th:nth-child(7), #products td:nth-child(7) {width:10%}
+                            #products th:nth-child(8), #products td:nth-child(8) {width:13%}
+                        </style>
+                        <div class="page">
+                            <div class="oe_structure"/>
+                            <div class="row mt32">
+                                <div style="text-align:center" class="col-xs-5">
+                                    <p>ЗАТВЕРДЖУЮ</p>
+                                    <p t-field="doc.company_id.name"/><br/>
+                                    <p>___________________________</p>
+                                    <span t-field="doc.user_id"/>
+                                </div>
+
+                                <div style="text-align:center" class="col-xs-5 col-xs-offset-2">
+                                    <p>ЗАТВЕРДЖУЮ</p>
+                                    <p t-field="doc.partner_id"/><br/>
+                                    <span>___________________________</span><br/>
+                                </div>
+                            </div>
+                            <br/>
+                            <h2 style="text-align:center">
+                                <span t-if="doc.state not in ['draft','sent']">Акт №</span>
+                                <span t-if="doc.state in ['draft','sent']">Пропозиція №</span>
+                                <span t-field="doc.name"/>
+                                <br/>
+                                <small>
+                                    <b>здачі-прийняття робіт (надання послуг)</b>
+                                </small>
+                            </h2>
+                            <!--  TODO: add related invoice info -->
+                            <p>Ми, представники Замовника - <span t-field="doc.partner_id"/> -
+                                ___________________ ____________________________________,
+                                з одної сторони, та <span t-field="doc.company_id"/>, з другої сторони,
+                                склали цей акт про те, що Виконавцем були проведені такі роботи
+                                (надані такі послуги) згідно з рахунком _________ від ____________
+                                згідно Додатку 1 до Договору <span t-field="doc.origin"/></p>
+                            <hr class="fat"></hr>
+
+                            <!-- Is there a discount on at least one line? -->
+                            <t t-set="display_discount" t-value="any([l.discount for l in doc.order_line])"/>
+                            <t t-set="display_sku" t-value="True"/>
+
+                            <table class="table table-bordered" id="products">
+                                <thead>
+                                    <tr class="active">
+                                        <th>№</th>
+                                        <th t-if="display_sku">Артикул</th>
+                                        <th>Товар</th>
+                                        <th class="text-right">Кількість</th>
+                                        <th class="text-left">Од.вимір.</th>
+                                        <th class="text-right">Ціна</th>
+                                        <th t-if="display_discount" class="text-right"
+                                            groups="sale.group_discount_per_so_line">Знижка(%)
+                                        </th>
+                                        <th class="text-right">Сума</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="sale_tbody">
+                                    <t t-set="i" t-value="1"></t>
+                                    <t t-foreach="doc.order_line" t-as="l">
+                                        <tr t-if="l.product_uom_qty">
+                                            <td>
+                                                <span t-esc="i"></span>
+                                                <t t-set="i" t-value="i+1"></t>
+                                            </td>
+                                            <td t-if="display_sku">
+                                                <span t-field="l.product_id.default_code"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="l.name"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-field="l.product_uom_qty"/>
+                                            </td>
+                                            <td>
+                                                <span groups="product.group_uom" t-field="l.product_uom"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-field="l.price_unit"/>
+                                            </td>
+                                            <td t-if="display_discount" class="text-right"
+                                                groups="sale.group_discount_per_so_line">
+                                                <span t-field="l.discount"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-field="l.price_subtotal"
+                                                      t-field-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                                <br/>
+                                                <span style="font-size: 6.5pt;"
+                                                      t-esc="', '.join(map(lambda x: (x.description or x.name), l.tax_id))"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+
+                            <div class="row" name="total">
+                                <div class="col-xs-5 pull-right">
+                                    <table class="table">
+                                        <tr class="border-black">
+                                            <td>
+                                                <strong>Всього без ПДВ</strong>
+                                            </td>
+                                            <td width="100" class="text-right">
+                                                <span t-field="doc.amount_untaxed"
+                                                      t-field-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ПДВ</td>
+                                            <td class="text-right">
+                                                <span t-field="doc.amount_tax"
+                                                      t-field-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-black">
+                                            <td>
+                                                <strong>Всього:</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-field="doc.amount_total"
+                                                      t-field-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <t t-set="sum_text" t-value="doc.format_sum_to_text(doc.amount_total)"/>
+                            <t t-set="lines_count" t-value="len(doc.order_line)"/>
+                            <t t-set="vat_text" t-value="doc.format_sum_to_text(doc.amount_tax)"/>
+
+                            <p>Всього найменувань <t t-esc="lines_count"/>, на суму <span t-field="doc.amount_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/><br/>
+                            <b><span t-esc="sum_text"/></b><br/>
+                                <b>У т.ч. ПДВ: <span t-esc="vat_text"/></b>
+                            </p>
+
+                            <p t-field="doc.note"/>
+                            <p t-if="doc.payment_term_id.note">
+                                <span t-field="doc.payment_term_id.note"/>
+                            </p>
+                            <p t-if="not doc.payment_term_id and doc.partner_id.property_payment_term_id">
+                                <span t-field="doc.partner_id.property_payment_term_id.note"/>
+                            </p>
+                            <div class="row">
+                                <div class="col-xs-3">Місце складання</div>
+                                <div class="col-xs-9">
+                                    <span t-field="doc.location_signed_in"/>
+                                </div>
+                            </div>
+                            <div class="oe_structure"/>
+
+                            <div class="row mt32">
+                                <div class="col-xs-5">
+                                    <span>Від виконавця:</span><br/>
+                                    <span t-if="doc.company_id">
+                                        <strong>
+                                            <p t-field="doc.company_id.name"/>
+                                        </strong>
+                                    </span>
+                                    <span t-if="not doc.company_id">______________________________</span>
+                                    <span t-field="doc.date_order" t-field-options='{"format":"d.MM.Y"}'/><br/>
+                                    <address t-field="doc.company_id.partner_id"
+                                             t-field-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": true, "phone_icons": true}'/>
+                                    <span t-if="doc.company_id.company_registry">ЄДРПОУ <span t-field="doc.company_id.company_registry"/>; </span>
+                                    <span t-if="doc.company_id.vat">ІПН <span t-field="doc.company_id.vat"/>; </span>
+                                    <span t-if="'property_account_position_id' in doc.company_id.partner_id.fields_get() and doc.company_id.partner_id.property_account_position_id.note"
+                                          t-field="doc.company_id.partner_id.property_account_position_id.note"/>
+                                    <t t-if="doc.company_id.bank_ids">
+                                        <t t-set="b" t-value="doc.company_id.bank_ids[0]"/>
+                                        <p>п\р
+                                            <span t-field="b.acc_number"/>
+                                            у <span t-field="b.bank_name"/>,
+                                            <t t-if="b.bank_id.bic">МФО
+                                                <span t-field="b.bank_id.bic"/>
+                                            </t>
+                                        </p>
+                                    </t>
+                                    <p>____________________  <t t-if="doc.user_id"><strong t-field="doc.user_id"/></t><t t-if="not doc.user_id">_____________</t></p>
+                                    <p>           М.П.</p>
+                                </div>
+
+                                <div t-if="doc.state not in ['draft','sent']" class="col-xs-5 col-xs-offset-2">
+                                    <span>Від замовника:</span><br/>
+                                    <b><p t-field="doc.partner_id"/></b>
+                                    <span t-field="doc.date_order" t-field-options='{"format":"d.MM.Y"}'/><br/>
+                                    <address t-field="doc.partner_id"
+                                             t-field-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": true, "phone_icons": true}'/>
+                                    <p><span t-if="'company_registry' in doc.partner_id.fields_get() and doc.partner_id.company_registry">
+                                        ЄДРПОУ <span t-field="doc.partner_id.company_registry"></span>;
+                                    </span>
+                                    <t t-if="doc.partner_id.bank_ids">
+                                        <t t-set="bp" t-value="doc.partner_id.bank_ids[0]"/>
+                                        п\р
+                                            <span t-field="bp.acc_number"/>
+                                            у <span t-field="bp.bank_name"/>,
+                                            <t t-if="bp.bank_id.bic">МФО
+                                                <span t-field="bp.bank_id.bic"/>
+                                            </t><br/>
+                                    </t>
+                                        <span t-if="doc.partner_id.vat">ІПН <span t-field="doc.company_id.vat"/></span></p>
+                                    <span t-if="doc.fiscal_position_id" t-field="doc.fiscal_position_id.note"/>
+                                    <span t-if="not doc.fiscal_position_id and 'property_account_position_id' in doc.partner_id.fields_get() and doc.partner_id.property_account_position_id.note"
+                                          t-field="doc.partner_id.property_account_position_id.note"/>
+                                    <p>_____________________  ______________</p>
+                                    <p>           М.П.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+
+    </data>
+</odoo>

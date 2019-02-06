@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_invoice_ua_1c_document2">
+                <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
+                 <style>
+                    .fat { border-width:2px; border-color:#0b0b0b; }
+                     .capitalize:first-letter {text-transform:uppercase}
+                    #products th:first-child, #products td:first-child {width:5%; min-width:30px;
+                    text-align:center }
+                    #products th:nth-child(2),#products td:nth-child(2) {width:10%}
+                    #products th:nth-child(3), #products td:nth-child(3) {width:32%}
+                    #products th:nth-child(4), #products td:nth-child(4) {width:8%}
+                    #products th:nth-child(5),#products td:nth-child(5) {width:9%}
+                    #products th:nth-child(6), #products td:nth-child(6) {width:10%}
+                    #products th:nth-child(7), #products td:nth-child(7) {width:10%}
+                    #products th:nth-child(8), #products td:nth-child(8) {width:13%}
+                </style>
+
+                <div class="article">
+                    <div class="row">
+
+                        <div class="col-xs-2">
+                            <u>Постачальник:</u>
+                        </div>
+                        <div class="col-xs-8">
+                            <strong t-field="o.company_id.name"></strong><br/>
+                            <p>ЄДРПОУ <span t-field="o.company_id.company_registry"/>, тел. <span t-field="o.company_id.phone"/><br/>  
+                             р\р <span t-field="o.company_id.partner_id.bank_account_count.acc_number" t-field-options='{"widget": "contact", "fields": ["address"], "no_marker": true}'/> у <span t-field="o.company_id.partner_id.bank_account_count.name" t-field-options='{"widget": "contact", "fields": ["address"], "no_marker": true}'/></p>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <u>Одержувач:</u>
+                        </div>
+                        <div class="col-xs-8">
+                            <div t-field="o.partner_id"
+                                t-field-options='{"widget": "contact", "fields": ["name", "phone"], "no_marker": true}' />
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <u>Платник:</u>
+                        </div>
+                        <div class="col-xs-8">
+                               той самий
+                        </div>
+                    </div>
+                    <br/>
+                    <h2 style="text-align:center">
+                        <span>Рахунок-фактура №</span>  <span t-field="o.number"/>   від  <span t-field="o.date_invoice"/>  р.
+                    </h2>
+                 
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Назва</th>
+                                <th class="hidden">Source Document</th>
+                                <th class="text-right">К-сть</th>
+                                <th class="text-right">Ціна без ПДВ</th>
+                                <th t-if="display_discount" class="text-right">Знижка</th>
+                                <th class="text-right">Сумма без ПДВ</th>
+                            </tr>
+                        </thead>
+                        <tbody class="invoice_tbody">
+                            <tr t-foreach="o.invoice_line_ids" t-as="l">
+                                <td>
+                                    <span t-field="l.name"/>
+                                </td>
+                                <td class="hidden">
+                                    <span t-field="l.origin"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="l.quantity"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="l.price_unit"/>
+                                </td>
+                                <td t-if="display_discount" class="text-right">
+                                    <span t-field="l.discount"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="l.price_subtotal"
+                                          t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="row">
+                        <div class="col-xs-4 pull-right">
+                            <table class="table table-condensed">
+                                <tr class="border-black">
+                                    <td>
+                                        <strong>Сума</strong>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="o.amount_total"
+                                              t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>    
+                            </table>
+                        </div>
+                    </div>
+
+                    <t t-set="sum_text" t-value="o.format_sum_to_text(o.amount_total)"/>
+                    <t t-set="lines_count" t-value="len(o.invoice_line_ids)"/>
+
+                    <p>Всього найменувань <t t-esc="lines_count"/>, на суму <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></p>
+                    <p class="capitalize"><b><span t-esc="sum_text"/></b></p>
+
+                    <hr/>
+					<table class="col-xs-12 pull-right">
+						<td>
+                        Виписав  <t t-if="o.user_id"> <u t-field="o.user_id"/>  _______________________   </t><t t-if="not o.user_id">  _______________________</t>
+						</td>
+						<td>
+						Отримав(ла) _______________________
+						</td>
+					</table>
+				</div>
+        </template>
+
+        <template id="report_invoice_ua_1c2">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="l10n_ua_invoice_report_1c.report_invoice_ua_1c_document2" t-lang="o.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

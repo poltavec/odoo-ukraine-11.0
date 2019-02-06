@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            string="Видаткова накладна"
+            id="action_report_sale_order_ua"
+            model="sale.order"
+            report_type="qweb-pdf"
+            name="l10n_ua_sale_report_1c.report_sale_order_ua_1c"
+            file="l10n_ua_sale_report_1c.report_sale_order_ua_1c"
+        />
+
+        <report
+            string="Акт виконаних рабіт"
+            id="action_report_sale_order_act_ua"
+            model="sale.order"
+            report_type="qweb-pdf"
+            name="l10n_ua_sale_report_1c.report_sale_order_act_ua_1c"
+            file="l10n_ua_sale_report_1c.report_sale_order_act_ua_1c"
+        />
+		<report
+            string="Акт виконаних рабіт2"
+            id="action_report_sale_order_act_ua2"
+            model="sale.order"
+            report_type="qweb-pdf"
+            name="l10n_ua_sale_report_1c.report_sale_order_act_ua_1c2"
+            file="l10n_ua_sale_report_1c.report_sale_order_act_ua_1c2"
+        />
+
+    </data>
+</odoo>

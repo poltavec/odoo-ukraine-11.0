@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            string="Приходная накладная"
+            id="action_report_purchase_order_ua"
+            model="purchase.order"
+            report_type="qweb-pdf"
+            name="l10n_ua_purchase_report_1c.report_purchase_order_ua_1c"
+            file="l10n_ua_purchase_report_1c.report_purchase_order_ua_1c"
+        />
+        <report
+            string="Заказ поставщику"
+            id="action_report_purchase_quotation_ua"
+            model="purchase.quotation"
+            report_type="qweb-pdf"
+            name="l10n_ua_purchase_report_1c.report_purchase_quotation_ua_1c"
+            file="l10n_ua_purchase_report_1c.report_purchase_quotation_ua_1c"
+        />
+
+    </data>
+</odoo>

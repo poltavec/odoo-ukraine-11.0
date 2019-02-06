@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            string="Накладна на реалізацію"
+            id="action_report_account_invoice_ua"
+            model="account.invoice"
+            report_type="qweb-html"
+            name="l10n_ua_invoice_report_1c.report_invoice_ua_1c"
+            file="l10n_ua_invoice_report_1c.report_invoice_ua_1c"
+        />
+		<report
+            string="Рахунок-фактура"
+            id="action_report_account_invoice_ua2"
+            model="account.invoice"
+            report_type="qweb-html"
+            name="l10n_ua_invoice_report_1c.report_invoice_ua_1c2"
+            file="l10n_ua_invoice_report_1c.report_invoice_ua_1c2"
+        />
+		<report
+            string="Поворотна накладна"
+            id="action_report_account_invoice_ua3"
+            model="account.invoice"
+            report_type="qweb-html"
+            name="l10n_ua_invoice_report_1c.report_invoice_ua_1c3"
+            file="l10n_ua_invoice_report_1c.report_invoice_ua_1c3"
+        />
+		
+    </data>
+</odoo>

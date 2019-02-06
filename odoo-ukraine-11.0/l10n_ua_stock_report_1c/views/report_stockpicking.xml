@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_stock_docs_ua_1c_template">
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})" />
+                <style>
+                    .fat { border-width:2px; border-color:#0b0b0b; }
+                    #products th:first-child, #products td:first-child {width:10%}
+                    #products th:nth-child(2), #products td:nth-child(2) {width:30%}
+                    #products th:nth-child(3), #products td:nth-child(3) {width:7%}
+                    #products th:nth-child(4), #products td:nth-child(4) {width:7%}
+                    #products th:nth-child(5), #products td:nth-child(5) {width:25%}
+                    #products th:nth-child(6), #products td:nth-child(6) {width:10%}
+                    #products th:nth-child(7), #products td:nth-child(7) {width:10%}
+
+
+                </style>
+                    <div class="page">
+                         `<div t-if="doc.picking_type_id.code=='incoming'">
+                                <h1 class="mt0">Прибуткова накладна <span t-field="doc.name"/> від </h1>
+                            </div>
+                            <div t-if="doc.picking_type_id.code=='internal'">
+                                <h1 class="mt0">Внутрішнє переміщення <span t-field="doc.name"/> від </h1>
+                            </div>
+                            <div t-if="doc.picking_type_id.code=='outgoing'">
+                                <h1 class="mt0">Видаткова накладна <span t-field="doc.name"/> від </h1>
+                            </div>
+                            <hr class="fat"/>
+                            <br/>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <div t-if="doc.picking_type_id.code=='incoming' and doc.partner_id">
+                                        <span><strong>Адреса постачальника:</strong></span>
+                                    </div>
+                                    <div t-if="doc.picking_type_id.code=='internal' and doc.partner_id">
+                                        <span><strong>Адреса складу:</strong></span>
+                                    </div>
+                                    <div t-if="doc.picking_type_id.code=='outgoing' and doc.partner_id">
+                                        <span><strong>Адреса отримувача:</strong></span>
+                                    </div>
+                                    <div t-if="doc.partner_id" name="partner_header">
+                                        <div t-field="doc.partner_id"
+                                           t-field-options='{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": true, "phone_icons": true}'/>
+                                        <p t-if="'company_registry' in doc.partner_id.fields_get() and doc.partner_id.company_registry">ЕДРПОУ: <span t-field="doc.partner_id.company_registry"/></p>
+                                    </div>
+                                </div>
+                                <div class="col-xs-5 col-xs-offset-1">
+                                    <div t-if="doc.move_lines and doc.move_lines[0].partner_id and doc.move_lines[0].partner_id.id != doc.partner_id.id">
+                                        <span><strong>Адреса доставки:</strong></span>
+                                        <div t-field="doc.move_lines[0].partner_id"
+                                            t-field-options='{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": true, "phone_icons": true}'/>
+                                    </div>
+                                    <div t-if="doc.picking_type_id.code != 'internal' and (not doc.move_lines or not doc.move_lines[0].partner_id) and doc.picking_type_id.warehouse_id.partner_id">
+                                        <span><strong>Адреса складу:</strong></span>
+                                        <div t-field="doc.picking_type_id.warehouse_id.partner_id"
+                                            t-field-options='{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": true, "phone_icons": true}'/>
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+
+
+                            <br/>
+
+                            <hr class="fat"></hr>
+                           <div>
+                               <div class="row mt32 mb16">
+                                   <div class="col-xs-6">
+                                       <span>Відвантажив(ла): ____________________________________</span>
+                                   </div>
+                                   <div class="col-xs-6 text-right">
+                                       <span>Прийняв(ла): ____________________________________</span>
+                                   </div>
+                               </div>
+                           </div>
+                        </div>
+            </t>
+        </template>
+        <template id="report_stock_docs_ua_1c" inherit_id="stock.report_picking">
+            <xpath expr="//t[@t-call='web.html_container']" position="replace">
+                <t t-call="web.html_container">
+                    <t t-foreach="docs" t-as="doc">
+                        <t t-call="l10n_ua_stock_report_1c.report_stock_docs_ua_1c_template" t-lang="doc.partner_id.lang"/>
+                    </t>
+                </t>
+			</xpath>
+        </template>
+
+    </data>
+</odoo>
