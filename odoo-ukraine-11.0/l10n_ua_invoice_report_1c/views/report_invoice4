@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_invoice_ua_1c_document4">
+           
+                <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
+                <div class="article">
+                    <div class="row mt32 mb32">
+						<table class="table" style="margin-top: 5px;">
+							<tr>
+								<td class="col-xs-6">
+									<img class="img img-responsive" src="/web/static/src/img/2710.jpg" />
+								</td>
+								<td class="col-xs-6">
+								<span t-foreach="o.invoice_line_ids" t-as="l"/>
+<span t-field="l.account_analytic_id"/><br/>
+Тел: <span t-field="o.user_id.phone"/><span t-field="o.user_id.mobile"/><br/>
+								</td>
+							</tr>
+						</table>         
+                    </div>
+					<p style="font-size: 15pt; margin-top: -4px;" class="text-center">Товарний чек №:<span t-field="o.number"/>   від   <span t-field="o.date_invoice" style="font-size: 10pt;"/></p>
+                    <table class="table table-condensed" name="invoice_line_table">
+                        <thead>
+                            <tr>
+                                <th>Товар</th>
+                                <th class="text-right">Ціна</th>
+								<th class="text-right">Кількість</th>
+                                <th class="text-right">Сума</th>
+                            </tr>
+                        </thead>
+                        <tbody class="invoice_tbody">
+                            <tr t-foreach="o.invoice_line_ids" t-as="l">
+                                <td><span t-field="l.product_id"/></td>
+                                <td class="text-right">
+                                    <span t-field="l.price_unit"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="l.quantity"/>   
+                                </td>
+                                <td class="text-right" id="subtotal">
+                                    <span t-field="l.price_subtotal"
+                                        t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                            </tr> 
+                        </tbody>
+                    </table>
+
+                    <div class="clearfix">
+                        <div id="total" class="row">
+                            <div class="col-xs-4 pull-right">
+                                <table class="table table-condensed" style="min-width: 250px;max-width: 400px;">
+                                    <tr class="border-black">
+                                        <td><strong>Сума :</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div> 
+					<div class="text-right" style="font-size: 12pt;  margin-top: 3px;">Без ПДВ.
+					</div>
+					<div style="font-size: 8pt;  margin-top: 25px;">______м.п_______
+					</div>
+					<div style="font-size: 12pt;  margin-top: 20px;">
+                        <tr>
+                            <td class="col-xs-6">
+                                <strong>Продавець: </strong><span t-field="o.user_id"/>                           
+                            </td>
+                            <td class="col-xs-6">
+                                <strong> Покупець: </strong><span t-field="o.partner_id"/>
+                            </td>
+                        </tr>
+					</div>
+					<div style="font-size: 7pt;  margin-top: 3px;">Гарантія на усунуті дефекти становить 3 місяців від дати ремонту або за окремим погодженням.
+					</div>
+					<div style="font-size: 8pt;  margin-top: 5px;">Приемка <span t-field="o.origin"/>
+					</div>
+					<div class="row mt32 mb32">
+						<table class="table" style="margin-top: 5px;">
+							<tr>
+								<td class="col-xs-6">
+									<img class="img img-responsive" src="/web/static/src/img/2710.jpg" />
+								</td>
+								<td class="col-xs-6">
+								<span t-foreach="o.invoice_line_ids" t-as="l"/>
+<span t-field="l.account_analytic_id"/><br/>
+Тел: <span t-field="o.user_id.phone"/><span t-field="o.user_id.mobile"/><br/>
+								</td>
+							</tr>
+						</table>         
+                    </div>
+					<p style="font-size: 15pt; margin-top: -4px;" class="text-center">Товарний чек №:<span t-field="o.number"/>  від  <span t-field="o.date_invoice" style="font-size: 10pt;"/></p>
+                    <table class="table table-condensed" name="invoice_line_table">
+                        <thead>
+                            <tr>
+                                <th>Товар</th>
+                                <th class="text-right">Ціна</th>
+								<th class="text-right">Кількість</th>
+                                <th class="text-right">Сума</th>
+                            </tr>
+                        </thead>
+                        <tbody class="invoice_tbody">
+                            <tr t-foreach="o.invoice_line_ids" t-as="l">
+                                <td><span t-field="l.product_id"/></td>
+                                <td class="text-right">
+                                    <span t-field="l.price_unit"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="l.quantity"/>   
+                                </td>
+                                <td class="text-right" id="subtotal">
+                                    <span t-field="l.price_subtotal"
+                                        t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                            </tr> 
+                        </tbody>
+                    </table>
+
+                    <div class="clearfix">
+                        <div id="total" class="row">
+                            <div class="col-xs-4 pull-right">
+                                <table class="table table-condensed" style="min-width: 250px;max-width: 400px;">
+                                    <tr class="border-black">
+                                        <td><strong>Сума :</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div> 
+					<div class="text-right" style="font-size: 12pt;  margin-top: 3px;">Без ПДВ.
+					</div>
+					<div style="font-size: 8pt;  margin-top: 25px;">______м.п_______
+					</div>
+					<div style="font-size: 12pt;  margin-top: 20px;">
+                        <tr>
+                            <td class="col-xs-6">
+                                <strong>Продавець: </strong><span t-field="o.user_id"/>                           
+                            </td>
+                            <td class="col-xs-6">
+                                <strong> Покупець: </strong><span t-field="o.partner_id"/>
+                            </td>
+                        </tr>
+					</div>
+					<div style="font-size: 7pt;  margin-top: 3px;">Гарантія на усунуті дефекти становить 3 місяців від дати ремонту або за окремим погодженням.
+					</div>
+					<div style="font-size: 8pt;  margin-top: 5px;">Приемка <span t-field="o.origin"/>
+					</div>
+                </div>           
+        </template>
+
+
+        <template id="report_invoice_ua_1c4">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="l10n_ua_invoice_report_1c.report_invoice_ua_1c_document4" t-lang="o.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>
