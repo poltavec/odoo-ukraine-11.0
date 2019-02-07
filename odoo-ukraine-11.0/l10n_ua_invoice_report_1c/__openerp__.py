@@ -18,8 +18,9 @@
     'demo': [],
     'data': [
             'views/report_invoice.xml',
-			'views/report_invoice2.xml',
-			'views/report_invoice3.xml',
+	    'views/report_invoice2.xml',
+	    'views/report_invoice3.xml',
+	    'views/report_invoice4.xml',
             'data/invoice_report_action.xml'
         ],
     'installable': True,
